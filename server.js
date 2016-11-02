@@ -13,7 +13,8 @@ io.on('connection', function(socket){
 		console.log('Message received: ' + message.text);
 		// io.emit broadcsts to all AND to sender
 		// socket.broadcast.emit broadcsts to all BUT NOT to the sender
-		socket.broadcast.emit('message', message);
+		io.emit('message', message);
+		//socket.broadcast.emit('message', message);
 	});
 
 	socket.emit('message',{
