@@ -1,4 +1,9 @@
+// getQueryVariable(someVar) is a custom function by andrewjmead
+var name = getQueryVariable('name') || 'Anonymous';
+var room = getQueryVariable('room');
 var socket = io();
+
+console.log(name + ' wants to join ' + room);
 
 socket.on('connect', function() {
 	console.log('Connected to socket.io server!');
@@ -9,9 +14,10 @@ socket.on('message', function(message) {
 	console.log('New message:');
 	console.log(message.text);
 
-	$('.messages').append('<p><strong>' +
+	$('.messages').append('<p><strong>' + message.name + ' ' +
 		momentTimestamp.local().format('DD/MM/YYYY, HH:mm:ss ') +
-		'</strong>' + message.text + '</p>');
+		'</strong></p>');
+	$('.messages').append('<p>' + message.text + '</p>');
 
 });
 
@@ -22,6 +28,7 @@ var msg = form.find('input[name=message]');
 form.on('submit', function(event) {
 	event.preventDefault();
 	socket.emit('message', {
+		name: name,
 		text: msg.val()
 	});
 
@@ -29,4 +36,3 @@ form.on('submit', function(event) {
 	msg.val('');
 
 });
-
