@@ -7,21 +7,33 @@ var moment = require('moment');
 
 app.use(express.static(__dirname + '/public'));
 
-io.on('connection', function(socket){
+var clientInfo = {};
+
+io.on('connection', function(socket) {
 	console.log('User connected via socket.io!');
 
-	socket.on('message', function(message){
-		console.log('User ' + message.name + ' wrote: ' + message.text);
-		
+	socket.on('joinRoom', function(req) {
+		clientInfo[socket.id] = req;
+		socket.join(req.room);
+		socket.broadcast.to(req.room).emit('message', {
+			name: 'System',
+			text: req.name + ' has joined!',
+			timestamp: moment().valueOf()
+		});
+	});
+
+	socket.on('message', function(message) {
+		console.log('In room ' + clientInfo[socket.id].room + ', user ' + message.name + ' wrote: ' + message.text);
+
 		message.timestamp = moment().valueOf();
 
 		// io.emit broadcsts to all AND to sender
 		// socket.broadcast.emit broadcsts to all BUT NOT to the sender
-		io.emit('message', message);
+		io.to(clientInfo[socket.id].room).emit('message', message);
 		//socket.broadcast.emit('message', message);
 	});
 
-	socket.emit('message',{		
+	socket.emit('message', {
 		name: 'System',
 		text: 'Welcome to the chat app!',
 		timestamp: moment().valueOf()

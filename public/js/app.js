@@ -5,8 +5,17 @@ var socket = io();
 
 console.log(name + ' wants to join ' + room);
 
+// Handles chat room name display
+// displays the room variable that was assigned the query room value
+$('#chat-room').text(room);
+
+
 socket.on('connect', function() {
 	console.log('Connected to socket.io server!');
+	socket.emit('joinRoom', {
+		name:name,
+		room: room
+	});
 });
 
 socket.on('message', function(message) {
@@ -36,3 +45,5 @@ form.on('submit', function(event) {
 	msg.val('');
 
 });
+
+
